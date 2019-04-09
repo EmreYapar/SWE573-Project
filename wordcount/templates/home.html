@@ -1,0 +1,15 @@
+THIS IS HTML FAM
+
+<form action="{% url 'count' %}">
+  {% csrf_token %}
+  <textarea name="fulltext" rows="8" cols="80"></textarea>
+  <br />
+  <input type="submit" value="Count!"/>
+  <br />
+
+</form>
+
+
+<form action="{% url 'about' %}" method='GET'>
+<button type='submit'> about</button>
+</form>
