@@ -1,9 +1,9 @@
 from django.shortcuts import render
 
-from .models import Job
+from course.models import Course
 
 def home(request):
-    jobs = Job.objects
-    return render(request, 'jobs/home.html', {'jobs':jobs})
+    courses = Course.objects
+    return render(request, 'jobs/home.html', {'courses':courses})
 
 # Create your views here.

@@ -10,5 +10,6 @@ urlpatterns = [
     path('', jobs.views.home, name='home'),
     path('blog/', include('blog.urls')),
     path('accounts/', include('accounts.urls')),
+    path('course/', include('course.urls'))
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

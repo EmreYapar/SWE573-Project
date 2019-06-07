@@ -7,7 +7,7 @@
       <h1 class="jumbotron-heading">Learn Mania</h1>
       <p class="lead text-muted">Learn for free, teach for free</p>
       <p>
-        <a href="#" class="btn btn-primary my-2">Start Learning</a>
+        <a href="{% url 'createcourse' %}" class="btn btn-primary my-2">Start Learning</a>
         <a href="#" class="btn btn-secondary my-2">Start Teaching</a>
       </p>
     </div>
@@ -17,18 +17,18 @@
     <div class="container">
 
       <div class="row">
-        {% for job in jobs.all   %}
+        {% for course in courses.all   %}
         <div class="col-md-4">
           <div class="card mb-4 shadow-sm">
-            <p class="card-text text-center">{{job.title}}</p>
-            <img class="card-img-top" src="{{job.image.url}}"/>
+            <p class="card-text text-center">{{course.title}}</p>
+            <img class="card-img-top" src="{{course.course_image.url}}"/>
             <div class="card-body">
-              <p class="card-text">{{job.summary}}</p>
+              <p class="card-text">{{course.description}}</p>
               <div class="d-flex justify-content-between align-items-center">
                 <div class="btn-group">
                   <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
                 </div>
-                <small class="text-muted">9 mins</small>
+                <small class="text-muted">{{course.creator}}</small>
               </div>
             </div>
           </div>
