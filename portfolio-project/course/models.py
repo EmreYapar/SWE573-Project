@@ -9,3 +9,15 @@ class Course(models.Model):
     is_published = models.BooleanField(default=False)
     is_publishable = models.BooleanField(default=False)
     course_image = models.ImageField(upload_to='images/')
+    wd = models.ManyToManyField('WikiData',blank=True)
+
+
+class WikiData(models.Model):
+    name = models.CharField(max_length=255)
+    image_url = models.CharField(max_length=2000, blank=True)
+    description = models.TextField(blank=True)
+    url = models.CharField(max_length=1000, blank=True)
+#    associated_course = models.ForeignKey('Course', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name

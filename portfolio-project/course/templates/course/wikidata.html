@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if error %}
+{{error}}
+<br/>
+<br/>
+{% endif %}
+
+
+
+<link rel="shortcut icon" href="">
+
+<div class="container-fluid" style="margin-top:40px;">
+
+    <form class="wikidataSearch" method="POST" action="{% url 'wikidata' course.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+
+            <h2>Glossary</h2>
+            <p>{{course.title}}</p>
+
+            <div class="row">
+                <div class="col-md-10">
+                    <input class="form-control" type="text" placeholder="Search" name="search_wikidata">
+                </div>
+
+                <div class="col-md-2">
+                    <a href="{% url 'editcourse' course.id %}" class="btn btn-danger btn-block" >Submit</a>
+                </div>
+            </div>
+
+            <ul class="list-group mt-4" id="demo2">
+
+                {%if w_json %}
+                {% for wikidata in w_json %}
+
+                <div class="list-group">
+                    <p class="list-group-item clearfix" style="margin-bottom:5px;">
+                        {{wikidata.label}} <small>(<a href="{{wikidata.url}}" target="_blank">{{ wikidata.title}}</a>)</small> {%if wikidata.description %}<small class="card-text">: {{ wikidata.description }}</small>{%endif%}
+
+                        <span class="pull-right">
+                            <a href="{% url 'searchwikidata' course.id wikidata.id %}" class="btn btn-danger" ><i></i></a>
+                    </span>
+                    </p>
+                </div>
+
+                {% endfor %} {%endif%}
+
+
+
+            </ul>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+{%endblock%}
