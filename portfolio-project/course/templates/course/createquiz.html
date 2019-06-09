@@ -1,0 +1,46 @@
+
+{% extends 'base.html' %}
+{% block content %}
+{% if error %}
+{{error}}
+<br/>
+<br/>
+<h1> BOII </h1>
+{% endif %}
+
+<p class="card-text text-center">{{coursepart.title}}</p>
+
+<form method="POST" action="{%url 'createquiz'%}" enctype="multipart/form-data">
+  {% csrf_token %}
+Question:
+<br/>
+  <input type="text" name="question"/>
+  <br/>
+  <br/>
+  Correct answer:
+  <br/>
+  <input type="text" name="trueanswer"/>
+<br/>
+<br/>
+  Wrong Answer:
+  <br/>
+  <input type="text" name="falseanswer1"/>
+  <br/>
+  <br/>
+  Wrong Answer:
+  <br/>
+  <input type="text" name="falseanswer2"/>
+  <br/>
+  <br/>
+  Wrong Answer:
+  <br/>
+  <input type="text" name="falseanswer3"/>
+
+  <br/>
+<br/>
+  <input class="btn btn-primary" name="Finalize" type="submit" value="Create Course"/>
+  <input class="btn btn-primary" name="AddPart" type="submit" value="Add Part"/>
+  <input class="btn btn-primary" name="AddQuiz" type="submit" value="Add Quiz"/>
+</form>
+
+{% endblock %}
