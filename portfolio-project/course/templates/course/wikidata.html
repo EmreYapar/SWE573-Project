@@ -6,56 +6,65 @@
 <br/>
 {% endif %}
 
+<form class="addwikidata" method="POST" id="search_wikidata" action="{%url 'wikidata'%}" enctype="multipart/form-data">
+  {% csrf_token %}
+  <br/>
+  <br/>
+  <label for="wikidata_search_input">Search Wikidata</label>
+  <br/>
+  <input type="text"  id="search_text" name="search_text"/>
+  <br/>
+  <br/>
+   <button type=”submit” class=”btn btn-default btn-submit”>Search</button>
+   <br/>
+   <br/>
+   <input class="btn btn-primary" name="Finalize" type="submit" value="Finish"/>
+</form>
+<br/>
+<br/>
+<form class="removewikidata" id="remove_wikidata" method="POST" action="" enctype="multipart/form-data">
+{% if wikidatas and course_id %}
+  {% for wikidata in wikidatas %}
+
+    {% if wikidata.associated_course_id == course_id %}
 
 
-<link rel="shortcut icon" href="">
+      {% csrf_token %}
+        <p class="list-group-item clearfix" style="margin-bottom:5px;">
+      {{wikidata.name}}
+      <input class="btn btn-secondary" name={{wikidata.id}} type="submit" value="Remove"/>
+    </p>
+
+</form>
+        <br/>
+        {% endif %}
+  {% endfor %} {% endif %}
+    <br/>
+    <br/>
+
 
 <div class="container-fluid" style="margin-top:40px;">
-
-    <form class="wikidataSearch" method="POST" action="{% url 'wikidata' course.id %}" enctype="multipart/form-data">
+    <form class="addwikidata" id="add_wikidata" method="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
-
         <div class="form-group">
 
-            <h2>Glossary</h2>
-            <p>{{course.title}}</p>
-
-            <div class="row">
-                <div class="col-md-10">
-                    <input class="form-control" type="text" placeholder="Search" name="search_wikidata">
-                </div>
-
-                <div class="col-md-2">
-                    <a href="{% url 'editcourse' course.id %}" class="btn btn-danger btn-block" >Submit</a>
-                </div>
-            </div>
-
-            <ul class="list-group mt-4" id="demo2">
-
-                {%if w_json %}
+                {% if w_json %}
                 {% for wikidata in w_json %}
 
                 <div class="list-group">
                     <p class="list-group-item clearfix" style="margin-bottom:5px;">
+                      <input class="btn btn-secondary" name={{forloop.counter}} type="submit" value="Add"/>
                         {{wikidata.label}} <small>(<a href="{{wikidata.url}}" target="_blank">{{ wikidata.title}}</a>)</small> {%if wikidata.description %}<small class="card-text">: {{ wikidata.description }}</small>{%endif%}
 
-                        <span class="pull-right">
-                            <a href="{% url 'searchwikidata' course.id wikidata.id %}" class="btn btn-danger" ><i></i></a>
-                    </span>
+
+
                     </p>
                 </div>
-
-                {% endfor %} {%endif%}
-
-
-
-            </ul>
-
+                <br/>
+                {% endfor %} {% endif %}
         </div>
-
     </form>
-
 </div>
 
 
-{%endblock%}
+{% endblock %}

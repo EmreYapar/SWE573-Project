@@ -26,7 +26,10 @@
               <p class="card-text">{{course.description}}</p>
               <div class="d-flex justify-content-between align-items-center">
                 <div class="btn-group">
-                  <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                  <a href="javascript:{document.getElementById('course{{ course.id }}').submit()}"<button class ="btn btn-primary">View</a>
+                  <form id= "course{{ course.id }}" method="POST" action ="{% url 'viewcourse' course.id %}">
+                  {% csrf_token %}
+                  </form>
                 </div>
                 <small class="text-muted">{{course.creator}}</small>
               </div>

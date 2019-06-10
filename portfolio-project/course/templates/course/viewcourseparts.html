@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+</br>
+</br>
+{{coursepart.title}}
+</br>
+</br>
+{{coursepart.description}}
+</br>
+</br>
+{{coursepart.body}}
+</br>
+</br>
+
+<form method="POST" action="{%url 'viewcoursequiz'%}" enctype="multipart/form-data">
+
+  {% csrf_token %}
+  
+<input class="btn btn-primary" name="quiz" type="submit" value="Continue to Quiz"/>
+  <form/>
+
+{% endblock %}

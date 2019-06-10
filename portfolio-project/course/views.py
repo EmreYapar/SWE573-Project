@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import Course
@@ -17,6 +17,8 @@ from django.http import HttpResponse
 def createcourse(request):
 
 	if request.method == 'POST':
+		if 'Finalize'in request.POST:
+			redirect(home)
 		if request.POST['title'] and request.POST['description']:
 			course = Course()
 			course.title = request.POST['title']
@@ -45,13 +47,14 @@ def createcoursepart(request):
 		if request.POST['title'] and request.POST['description'] and request.POST['body']:
 			coursepart = CoursePart()
 			coursepart.title = request.POST['title']
+			coursepart.course = course
 			coursepart.associated_course_id = course.id
 			coursepart.description = request.POST['description']
 			coursepart.body = request.POST['body']
 			coursepart.save()
 			request.session['coursepart_id'] = coursepart.id
 			if 'Finalize' in request.POST:
-				return redirect('home')
+					return render(request,'course/wikidata.html')
 			elif 'AddQuiz' in request.POST:
 				return render(request,'course/createquiz.html', {'coursepart':coursepart})
 			elif 'AddPart' in request.POST:
@@ -75,6 +78,7 @@ def createquiz(request):
 		if request.POST['question'] and request.POST['trueanswer']:
 			quiz = Quiz()
 			quiz.associated_coursepart_id = coursepart.id
+			quiz.question = request.POST['question']
 			quiz.trueAnswer = request.POST['trueanswer']
 			quiz.falseAnswer1 = request.POST['falseanswer1']
 			quiz.falseAnswer2 = request.POST['falseanswer2']
@@ -89,50 +93,96 @@ def createquiz(request):
 						course = c
 				return render(request,'course/createcoursepart.html',{'course':course})
 			elif 'Finalize' in request.POST:
-								return redirect('home')
+				return render(request,'course/wikidata.html')
 		else:
 			return render(request,'course/createquiz.html',{'coursepart':coursepart},{'error':'at least a question and one answer is needed'})
 	else:
 		return render(request,'course/createquiz.html',{'coursepart':coursepart})
 
+
+def viewcourse(request,course_id):
+	course = get_object_or_404(Course, pk=course_id)
+	request.session['current_enrolled_course'] = course.id
+	wikidatas = WikiData.objects.all()
+	return render(request, 'course/viewcourse.html',{'course':course},{'wikidatas',wikidatas})
+
+def viewcourseparts(request):
+	course = get_object_or_404(Course, pk=request.session['current_enrolled_course'])
+	courseparts = CoursePart.objects.all()
+	for cp in courseparts:
+		if request.session['current_enrolled_course'] == cp.associated_course_id:
+			coursepart = cp
+	request.session['current_enrolled_course_part'] = coursepart.id
+	if request.method == 'POST':
+		if 'Home' in request.POST:
+			return redirect('home');
+		if 'Enroll' in request.POST:
+			return render(request,'course/viewcourseparts.html',{'coursepart':coursepart})
+	return render(request,'course/viewcourseparts.html',{'coursepart':coursepart})
+
+def viewcoursequiz(request):
+	quizes = Quiz.objects.all()
+	for q in quizes:
+		if request.session['current_enrolled_course_part'] == q.associated_coursepart_id:
+			quiz = q
+	request.session['current_enrolled_course_part']
+	if request.method == 'POST':
+		if 'trueAnswer' in request.POST:
+			return redirect('home')
+		else:
+			return render(request, 'course/viewcoursequiz.html', {'quiz':quiz}, {'error':'Wrong Answer, Try Again'})
+	return render(request, 'course/viewcoursequiz.html', {'quiz':quiz})
+
+
+
+
+
+
+
+
+
+
+
+
 #@app.route('/wikidata', methods=['POST'])
 def wikidata(request):
+	wikidatas = WikiData.objects.all()
+	course_id = request.session['course_id']
 	if request.method =="POST":
-		wikidata_id = request.POST['search_text']
+		if 'Finalize' in request.POST:
+			return redirect('home')
+		for wd in wikidatas:
+			if str(wd.id) == request.POST:
+				wd.delete()
+
+		if 'search_text' in request.POST:
+			wikidata_id = request.POST['search_text']
+			request.session['search_text'] = wikidata_id
+		else:
+			wikidata_id = request.session['search_text']
+		API_ENDPOINT = "https://www.wikidata.org/w/api.php"
+		query =  wikidata_id
+		params = {
+			   	'action': 'wbsearchentities',
+		    	'format': 'json',
+		    	'language': 'en',
+		    	'limit': '10',
+			    'search': query
+				}
+		wiki_request = requests.get(API_ENDPOINT, params = params)
+		w_json = wiki_request.json()['search']
+		w_json = json.dumps(w_json)
+		w_json = json.loads(w_json)
+
+		wikidata = WikiData()
+		for i in range(0,10):
+			if str(i) in request.POST:
+				wikidata.name = w_json[i]['label']
+				wikidata.description = w_json[i]['description']
+				wikidata.code = w_json[i]['url']
+				wikidata.associated_course_id = course_id
+				wikidata.save()
+				return render(request,'course/wikidata.html',{'w_json':w_json, 'course_id':course_id, 'wikidatas':wikidatas})
+		return render(request,'course/wikidata.html',{'w_json':w_json, 'course_id':course_id, 'wikidatas':wikidatas})
 	else:
-		wikidata_id = ""
-	wikidata = WikiData()
-
-	API_ENDPOINT = "https://www.wikidata.org/w/api.php"
-	query =  wikidata_id
-	params = {
-		    'action': 'wbsearchentities',
-		    'format': 'json',
-		    'language': 'en',
-		    'limit': '1',
-		    'search': query
-		}
-	wiki_request = requests.get(API_ENDPOINT, params = params)
-	w_json = wiki_request.json()['search']
-	w_json = json.dumps(w_json)
-	w_json = json.loads(w_json)
-
-	for entity in w_json:
-		wikidata.name = entity['label']
-		wikidata.description = entity['description']
-		wikidata.url = "https:" + entity['url']
-	try:
-		URL = "https://www.wikidata.org/w/api.php?action=wbgetclaims&entity={}&format=json".format(wikidata_id)
-		req = requests.get(URL).json()
-		image_name= req['claims']['P18'][0]['mainsnak']['datavalue']['value']
-		image_name = image_name.replace(' ', '_')
-		md5sum = hashlib.md5(image_name.encode('utf-8')).hexdigest()
-		a = md5sum[:1]
-		ab = md5sum[:2]
-		image_URL = "https://upload.wikimedia.org/wikipedia/commons/{}/{}/{}".format(a,ab,image_name)
-		wikidata.image_url = image_URL
-	except:
-		pass
-		wikidata.associated_course = 1
-	wikidata.save()
-	return HttpResponse('Post request success')
+		return render(request,'course/wikidata.html')

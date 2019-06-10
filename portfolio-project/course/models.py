@@ -12,24 +12,25 @@ class Course(models.Model):
     wd = models.ManyToManyField('WikiData',blank=True)
 
 
+
 class WikiData(models.Model):
     name = models.CharField(max_length=255)
-    image_url = models.CharField(max_length=2000, blank=True)
     description = models.TextField(blank=True)
-    url = models.CharField(max_length=1000, blank=True)
+    code = models.CharField(max_length=1000)
+    associated_course_id = models.IntegerField(blank=False)
 #    associated_course = models.ForeignKey('Course', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
 class CoursePart(models.Model):
-    associated_course_id =  models.IntegerField()
+    associated_course_id =  models.IntegerField(blank=False)
     title = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     body = models.TextField(blank=True)
 
 class Quiz(models.Model):
-    associated_coursepart_id =  models.IntegerField()
+    associated_coursepart_id =  models.IntegerField(blank=False)
     question = models.CharField(max_length=255)
     trueAnswer = models.CharField(max_length=255)
     falseAnswer1 = models.CharField(max_length=255)

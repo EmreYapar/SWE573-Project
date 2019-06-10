@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+
+</br>
+</br>
+{{course.title}}
+</br>
+</br>
+<img class="card-img-top" src="{{course.course_image.url}}" style='height: 50%; width: 50%; object-fit: contain'/>
+</br>
+</br>
+{{course.description}}
+</br>
+</br>
+{% for wikidata in wikidatas.all  %}
+{% if wikidata.associated_course_id == course.id %}
+
+</br>
+</br>
+{{wikidata.name}}
+
+</br>
+</br>
+{% endif %}
+</br>
+</br>
+
+{% endfor %}
+
+
+<form method="POST" action="{%url 'viewcourseparts'%}" enctype="multipart/form-data">
+
+  {% csrf_token %}
+<input class="btn btn-primary" name="Enroll" type="submit" value="Enroll"/>
+  <form/>
+
+  <form method="POST" action="{%url 'home'%}" enctype="multipart/form-data">
+
+  {% csrf_token %}
+<input class="btn btn-secondary" name="Home" type="submit" value="Back"/>
+
+
+  <form/>
+{% endblock %}

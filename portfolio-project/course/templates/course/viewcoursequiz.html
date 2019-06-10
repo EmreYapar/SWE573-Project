@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+</br>
+</br>
+{{quiz.question}}
+</br>
+</br>
+
+
+
+<form method="POST" action="{%url 'viewcoursequiz'%}" enctype="multipart/form-data">
+
+  {% csrf_token %}
+<input class="btn btn-secondary" name="trueAnswer" type="submit" value={{quiz.trueAnswer}}>
+  <form/>
+
+  <form method="POST" action="{%url 'viewcoursequiz'%}" enctype="multipart/form-data">
+
+    {% csrf_token %}
+  <input class="btn btn-secondary" name="falseAnswer1" type="submit" value={{quiz.falseAnswer1}}>
+    <form/>
+
+    <form method="POST" action="{%url 'viewcoursequiz'%}" enctype="multipart/form-data">
+
+{% if quiz.falseAnswer2 != '' %}
+      {% csrf_token %}
+    <input class="btn btn-secondary" name="falseAnswer2" type="submit" value={{quiz.falseAnswer2}}>
+      <form/>
+{% endif %}
+
+{% if quiz.falseAnswer3 != '' %}
+      <form method="POST" action="{%url 'viewcoursequiz'%}" enctype="multipart/form-data">
+
+        {% csrf_token %}
+      <input class="btn btn-secondary" name="falseAnswer3" type="submit" value={{quiz.falseAnswer3}}>
+        <form/>
+      {% endif %}
+</br>
+</br>
+{% if error %}
+{{error}}
+<br/>
+<br/>
+{% endif %}
+{% endblock %}
